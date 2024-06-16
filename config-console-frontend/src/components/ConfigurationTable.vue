@@ -4,12 +4,27 @@ import CustomModal from './CustomModal.vue'
 
 const isModalActive = ref(false)
 
-const showModal = () => {
+const isDialogActive = ref(false)
+
+const showModal = (index: number) => {
+  editIndex.value = index
+  currentParameters.value = { ...parameters.value[index] }
   isModalActive.value = true
+}
+
+const showDialog = () => {
+  isDialogActive.value = true
 }
 
 const closeModal = () => {
   isModalActive.value = false
+  editIndex.value = -1
+  currentParameters.value = { ...newParameter.value }
+}
+
+const saveEdit = (updatedParameter: Object) => {
+  parameters.value[editIndex.value] = { ...updatedParameter }
+  closeModal()
 }
 
 const parameters = ref([
@@ -61,6 +76,8 @@ const newParameter = ref({
   description: '',
   createDate: ''
 })
+
+const currentParameters = ref({ ...newParameter.value })
 
 const addParameter = () => {
   if (
@@ -142,8 +159,13 @@ function getCurrentTime(): string {
         <div class="table-item">{{ parameter.description }}</div>
         <div class="table-item">{{ parameter.createDate }}</div>
         <div class="table-item">
-          <button @click="showModal" class="edit-btn">Edit</button>
-          <CustomModal v-if="isModalActive" @close="closeModal" />
+          <button @click="showModal(index)" class="edit-btn">Edit</button>
+          <CustomModal
+            :parameter="currentParameters"
+            v-if="isModalActive"
+            @close="closeModal"
+            @save="saveEdit"
+          />
           <button @click="deleteParameter(index)" class="delete-btn">Delete</button>
         </div>
       </div>
@@ -280,6 +302,17 @@ function getCurrentTime(): string {
   padding: 5px;
   border-radius: 5px;
   background: var(--gradient-tag);
+  transition: background-color 0.3s;
+}
+
+.value-tag:hover {
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 10px;
+  display: inline-flex;
+  padding: 5px;
+  border-radius: 5px;
+  background: var(--gradient-delete-button);
 }
 
 input {

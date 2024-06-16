@@ -11,6 +11,8 @@
   --vt-c-black-soft: #222222;
   --vt-c-black-mute: #282828;
 
+  --vt-c-black-transparent: #00000047;
+
   --vt-c-indigo: #32335a;
 
   --vt-c-dark-grey: #6a778c;
@@ -31,6 +33,7 @@
 /* semantic color variables for this project */
 :root {
   --color-background: var(--vt-c-navy);
+  --color-background-muted: var(--vt-c-black-transparent);
 
   --color-border: var(--vt-c-pink);
   --color-border-hover: var(--vt-c-pink);
