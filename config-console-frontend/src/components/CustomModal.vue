@@ -8,7 +8,7 @@ const props = defineProps({
 
 const editData = ref(deepClone({ ...props.parameter }))
 
-const addValueAndTagData = ref({ value_tag: '', value: '' })
+const addValueAndTagData = ref({ value_tag: 'default', value: '' })
 
 const emit = defineEmits(['close', 'save'])
 
@@ -18,7 +18,7 @@ const close = () => {
 
 watch(props, (newVal) => {
   editData.value = { ...newVal.parameter }
-  addValueAndTagData.value = { value_tag: '', value: '' }
+  addValueAndTagData.value = { value_tag: 'default', value: '' }
 })
 
 const saveEdit = () => {
@@ -26,13 +26,14 @@ const saveEdit = () => {
 }
 
 const addValueAndTag = () => {
-  if (editData.value.value[0].value && editData) {
-    if (editData.value.value[0].value_tag == '') {
-      editData.value.value[0].value_tag = 'default'
-    }
+  if (editData.value.value[0].value) {
     editData.value.value.push({ ...addValueAndTagData.value })
-    addValueAndTagData.value = { value_tag: '', value: '' }
+    addValueAndTagData.value = { value_tag: 'default', value: '' }
   }
+}
+
+const deleteValueAndTag = (index: number) => {
+  editData.value.value.splice(index, 1)
 }
 </script>
 
@@ -44,13 +45,14 @@ const addValueAndTag = () => {
         <p class="input-title">Parameter Key:</p>
         <input v-model="editData.key" placeholder="Edit Parameter Key" />
       </div>
-      <br/>
+      <br />
       <div class="input-item">
         <p class="input-title">Value:</p>
         <div class="values-container">
-          <div class="values" v-for="val in editData.value" :key="val.value_tag">
+          <div class="values" v-for="(val, index) in editData.value" :key="val.value_tag">
             <input v-model="val.value_tag" class="value-tag" />
             <input v-model="val.value" class="value-value" />
+            <button @click="deleteValueAndTag(index)" class="close-button-x">X</button>
           </div>
         </div>
       </div>
@@ -94,11 +96,10 @@ h2 {
   background: var(--color-background);
   padding: 100px;
   border-radius: 15px;
-  max-width: 500px;
   display: flex;
+  width: 500px;
+  height: max-content;
   flex-direction: column;
-  width: 400px;
-  height: fit-content;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -129,11 +130,10 @@ input:focus {
   box-shadow: none;
 }
 
-
 .values {
   display: inline-flex;
   align-items: center;
-  margin-right: 10px;
+  margin-right: 30px;
   margin-bottom: 5px;
   gap: 2px;
 }
@@ -165,6 +165,18 @@ input:focus {
   background: var(--gradient-delete-button);
   border: none;
   padding: 10px;
+  color: white;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.close-button-x {
+  margin-left: 3px;
+  background: var(--gradient-delete-button);
+  width: fit-content;
+  border: none;
   color: white;
   text-align: center;
   border-radius: 5px;
@@ -208,9 +220,26 @@ input:focus {
   grid-column: 5;
 }
 
-.buttons{
+.buttons {
   display: flex;
   justify-content: center;
   gap: 10px;
+}
+
+@media (max-width: 700px) {
+  .modal-overlay {
+    overflow: auto;
+  }
+  .modal {
+    padding: 20px;
+    border-radius: 15px;
+    min-width: 200px;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    flex-direction: column;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+  }
 }
 </style>

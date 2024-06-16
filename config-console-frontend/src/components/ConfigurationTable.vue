@@ -205,7 +205,13 @@ function getCurrentTime(): string {
           </div>
         </div>
         <div class="card-actions">
-          <button @click="editParameter(index)" class="edit-btn">Edit</button>
+          <button @click="showModal(index)" class="edit-btn">Edit</button>
+          <CustomModal
+            :parameter="currentParameters"
+            v-if="isModalActive"
+            @close="closeModal"
+            @save="saveEdit"
+          />
           <button @click="deleteParameter(index)" class="delete-btn">Delete</button>
         </div>
         <div v-if="editIndex === index" class="edit-form">
@@ -362,7 +368,7 @@ input:focus {
   display: none;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 720px) {
   .table-container {
     display: none;
   }
