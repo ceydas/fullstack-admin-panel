@@ -1,31 +1,67 @@
 <script setup lang="ts">
 import SigninButton from '../components/SigninButton.vue'
+import '../assets/base.css'
+
+import { ref} from 'vue'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { useRouter } from 'vue-router'
+
+
+const email = ref('')
+const password = ref('')
+const errMsg = ref('')
+const router = useRouter()
+
+const signin = (): void => {
+  const auth = getAuth()
+  console.log(auth)
+  signInWithEmailAndPassword(auth, email.value, password.value)
+    .then(() => {
+      router.push('/')
+    })
+    .catch((error) => {
+      console.log(error.code)
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errMsg.value = 'Invalid email'
+          break
+        case 'auth/user-not-found':
+          errMsg.value = 'User not found'
+          break
+        case 'auth/wrong-password':
+          errMsg.value = 'Incorrect password'
+          break
+        default:
+          errMsg.value = 'Email or password was incorrect'
+          break
+      }
+    })
+}
 </script>
 
 <template>
   <h1>Please sign in</h1>
   <div class="form-container">
-    <form @submit.prevent="submitForm">
-      <div class="inputs-container">
-        <div class="input-group">
-          <input
-            type="email"
-            v-model="email"
-            placeholder="E-mail address"
-            class="input-field email"
-          />
-        </div>
-        <div class="input-group">
-          <input
-            type="password"
-            v-model="password"
-            placeholder="Password"
-            class="input-field password"
-          />
-        </div>
+    <div class="inputs-container">
+      <div class="input-group">
+        <input
+          type="email"
+          v-model="email"
+          placeholder="E-mail address"
+          class="input-field email"
+        />
       </div>
-      <SigninButton msg="Sign in" />
-    </form>
+      <div class="input-group">
+        <input
+          type="password"
+          v-model="password"
+          placeholder="Password"
+          class="input-field password"
+        />
+      </div>
+    </div>
+    <SigninButton @click="signin" msg="Sign in" />
+    <p class="err-message" v-if="errMsg">{{ errMsg }}</p>
   </div>
 </template>
 
@@ -33,16 +69,13 @@ import SigninButton from '../components/SigninButton.vue'
 .prompt {
   font-size: 20px;
   font-weight: 200;
-  color: ;
+  color: white;
 }
 .form-container {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-form {
-  display: flex;
+  text-align: center;
   flex-direction: column;
 }
 
@@ -64,6 +97,8 @@ form {
   border-bottom-right-radius: 15px;
   background-color: transparent; /* Input background color */
   outline: none;
+  color: beige;
+  font-weight: 300;
   transition: border 0.3s;
   font-size: 20px;
   border: 1px solid #2d3551;
@@ -83,5 +118,8 @@ form {
   .input-field {
     width: 40vmax;
   }
+}
+.err-message {
+  color: var(--co);
 }
 </style>

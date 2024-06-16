@@ -9,16 +9,16 @@ import { initializeApp } from 'firebase/app'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: 'AIzaSyBSLE4YPcX9V54JyOrXl6WAsSOPBa8G0YI',
-  authDomain: 'codeway-fullstack-case-b9901.firebaseapp.com',
-  projectId: 'codeway-fullstack-case-b9901',
-  storageBucket: 'codeway-fullstack-case-b9901.appspot.com',
-  messagingSenderId: '672307773664',
-  appId: '1:672307773664:web:24d329511a22e9feb11085'
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
-initializeApp(firebaseConfig)
-
+const init = initializeApp(firebaseConfig)
+console.log(init)
 const app = createApp(App)
 
 app.use(createPinia())
