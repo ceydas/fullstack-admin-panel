@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { auth } from '../main'
 import { getAuth, onAuthStateChanged, type User } from 'firebase/auth'
 import CustomModal from './CustomModal.vue'
 import getCurrentTime from '@/util/config-util'
 import type { Parameter } from '@/types/Parameter'
 import authenticatedRequest from '../middleware/config-middleware'
-import axios from 'axios'
 
 const isModalActive = ref(false)
 
@@ -73,20 +71,33 @@ const newParameter = reactive({
 
 const currentParameters = reactive({ ...newParameter.value })
 
-const addParameter = () => {
-  if (newParameter.key && newParameter.value[0].value && newParameter.description) {
-    newParameter.createDate = getCurrentTime()
-    //TODO: send backend api post request
-    if (newParameter.value[0].value_tag == '') {
-      newParameter.value[0].value_tag = 'default'
+const addParameter = async () => {
+  try {
+    if (user.value) {
+      // <-- null check
+      const token = await user.value.getIdToken(true)
+
+      if (newParameter.key && newParameter.value[0].value && newParameter.description) {
+        newParameter.createDate = getCurrentTime()
+        if (newParameter.value[0].value_tag == '') {
+          newParameter.value[0].value_tag = 'default'
+        }
+
+        const response = await authenticatedRequest(token, '/configs', 'POST', newParameter)
+        console.log(response)
+        parameters.push({ ...newParameter })
+        Object.assign(newParameter, {
+          key: '',
+          value: [{ value_tag: '', value: '' }],
+          description: '',
+          createDate: ''
+        })
+      } else {
+        console.error('User is not authenticated')
+      }
     }
-    parameters.push({ ...newParameter })
-    Object.assign(newParameter, {
-      key: '',
-      value: [{ value_tag: '', value: '' }],
-      description: '',
-      createDate: ''
-    })
+  } catch (error) {
+    console.error('Error fetching parameters: ', error)
   }
 }
 

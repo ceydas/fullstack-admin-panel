@@ -46,10 +46,12 @@ app.get("/configs", authenticateToken, async (req, res) => {
   return res.status(200).send(documents);
 });
 
-app.post("/configs", async (req, res) => {
-  const { configObject } = req.body;
+app.post("/configs", authenticateToken, async (req, res) => {
+  const configObject = req.body;
 
-  if (!configObject) {
+  console.log(configObject);
+
+  if (configObject == null) {
     return res
       .status(400)
       .send({ error: "Configuration parameters required." });
@@ -59,6 +61,7 @@ app.post("/configs", async (req, res) => {
   var snapshot = await refToDoc.set(configObject);
 
   console.log(req.body);
+
   res.status(200).send(configObject);
 });
 

@@ -23,3 +23,14 @@ export default async function authenticatedRequest(token, endpoint, method, data
     throw error
   }
 }
+
+
+// set admin privileges to uid
+export const setAdminPrivileges = async (uid) => {
+  try {
+    await admin.auth().setCustomUserClaims(uid, { admin: true })
+    console.log('Admin privileges granted to user:', uid)
+  } catch (error) {
+    console.error('Error setting admin privileges:', error)
+  }
+}
