@@ -6,7 +6,7 @@ VueJS 3 for the front end and NodeJS for the back end are used.
 - `TODO`
 
 ## Overview
-* Given the time constraint, in order to keep things simple, two separate services **frontend** and **backend** were used since separating the backend service into admin and user, which would introduce additional complexity due to separating databases and additional HTTP communication.
+* Given the time constraint, in order to keep things simple, two separate services **frontend** and **backend** were used since separating the backend service into admin and user would introduce additional complexity due to separating databases and additional HTTP communication.
 
 * The frontend was tested for responsiveness on 10+ devices.
 
