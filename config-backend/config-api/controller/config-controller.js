@@ -1,7 +1,7 @@
 import express from "express";
 import { db } from "../../firebase.js";
 import { authenticateToken } from "../middleware/config-middleware.js";
-import { log } from "three/examples/jsm/nodes/Nodes.js";
+import createServingApiResponse from "./response-util.js";
 const app = express();
 const port = 8383;
 
@@ -31,6 +31,10 @@ app.options("*", (req, res) => {
   res.sendStatus(200);
 });
 
+app.get("/configs/country/", (req, res) => {
+  return res.redirect("/configs/country/default");
+});
+
 app.get("/configs", authenticateToken, async (req, res) => {
   var snapshot = await configParametersCollectionRef.get();
   if (snapshot.empty) {
@@ -58,8 +62,6 @@ app.post("/configs", authenticateToken, async (req, res) => {
   const refToDoc = configParametersCollectionRef.doc(configObject.key);
   var snapshot = await refToDoc.set(configObject);
 
-  console.log(req.body);
-
   res.status(200).send(configObject);
 });
 
@@ -76,32 +78,27 @@ app.delete("/configs/:key", authenticateToken, async (req, res) => {
   res.status(200).send(key);
 });
 
-app.get("/configs/:country", async (req, res) => {
+/** The only function used by regular users : Get all
+ *  configuration parameters for a specified country,
+ * or default parameters if a country is not specified. **/
+
+app.get("/configs/country/:country", async (req, res) => {
   const { country } = req.params;
-  var country_param = "default";
-  if (country) {
-    country_param = country;
-  }
+  const country_param = country || "default";
   var snapshot = await configParametersCollectionRef.get();
+
   if (snapshot.empty) {
     console.log("No matching documents.");
     return res.sendStatus(400);
   }
 
-  let documents = [];
-  snapshot.forEach((doc) => {
-    documents.push({ key: doc.parameter_key, ...doc.data() });
-  });
-
-  return res.status(200).send(documents);
+  const response = createServingApiResponse(snapshot, country_param);
+  return res.status(200).send(response);
 });
 
 app.put("/configs/:key", authenticateToken, async (req, res) => {
   const configKey = req.params.key;
   const configObject = req.body;
-
-  console.log(configKey);
-  console.log(configObject);
 
   if (!configObject) {
     return res
