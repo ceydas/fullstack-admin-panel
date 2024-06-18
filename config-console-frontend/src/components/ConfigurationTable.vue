@@ -5,6 +5,7 @@ import CustomModal from './CustomModal.vue'
 import getCurrentTime from '@/util/config-util'
 import type { Parameter } from '@/types/Parameter'
 import authenticatedRequest from '../middleware/config-middleware'
+import { deepClone } from '@/util/config-util'
 
 const isModalActive = ref(false)
 
@@ -22,9 +23,9 @@ const emptyParameters: Parameter = {
 }
 
 // Parameters in the input field
-const newParameter = reactive<Parameter>({...emptyParameters})
+const newParameter = reactive<Parameter>(deepClone({...emptyParameters}))
 
-const currentParameters = reactive<Parameter>({ ...emptyParameters })
+const currentParameters = reactive<Parameter>(deepClone({ ...emptyParameters }))
 
 const showModal = (index: number) => {
   editIndex.value = index
@@ -35,7 +36,7 @@ const showModal = (index: number) => {
 const closeModal = () => {
   isModalActive.value = false
   editIndex.value = -1
-  Object.assign(currentParameters, {...emptyParameters})
+  Object.assign(currentParameters, deepClone({...emptyParameters}))
 }
 
 /* Called when user edits the modal data and clicks save */
@@ -114,7 +115,7 @@ const addParameter = async () => {
         parameters.push({ ...newParameter })
 
         // reset 'newparameter'
-        Object.assign(newParameter, {...emptyParameters})
+        Object.assign(newParameter,deepClone( {...emptyParameters}))
       } else {
         console.error('User is not authenticated')
       }
@@ -136,7 +137,7 @@ const deleteParameter = async (index: number) => {
         console.log(response)
         parameters.splice(index, 1)
         // reset 'newparameter'
-        Object.assign(newParameter, {...emptyParameters})
+        Object.assign(newParameter, deepClone({...emptyParameters}))
       } else {
         console.error('User is not authenticated')
       }
