@@ -49,9 +49,7 @@ app.get("/configs", authenticateToken, async (req, res) => {
 app.post("/configs", authenticateToken, async (req, res) => {
   const configObject = req.body;
 
-  console.log(configObject);
-
-  if (configObject == null) {
+  if (!configObject) {
     return res
       .status(400)
       .send({ error: "Configuration parameters required." });
@@ -65,7 +63,20 @@ app.post("/configs", authenticateToken, async (req, res) => {
   res.status(200).send(configObject);
 });
 
-app.get("/configs/:country", async (req, res, next) => {
+app.delete("/configs/:key", authenticateToken, async (req, res) => {
+  const { key } = req.params;
+
+  if (!key) {
+    return res.status(400).send({ error: "Key required" });
+  }
+
+  const refToDoc = configParametersCollectionRef.doc(key);
+  var snapshot = await refToDoc.delete();
+
+  res.status(200).send(key);
+});
+
+app.get("/configs/:country", async (req, res) => {
   const { country } = req.params;
   var country_param = "default";
   if (country) {
@@ -83,6 +94,34 @@ app.get("/configs/:country", async (req, res, next) => {
   });
 
   return res.status(200).send(documents);
+});
+
+app.put("/configs/:key", authenticateToken, async (req, res) => {
+  const configKey = req.params.key;
+  const configObject = req.body;
+
+  console.log(configKey);
+  console.log(configObject);
+
+  if (!configObject) {
+    return res
+      .status(400)
+      .send({ error: "Configuration parameters required." });
+  }
+
+  if (!configKey) {
+    return res.status(400).send({ error: "Configuration key required." });
+  }
+
+  try {
+    const refToDoc = configParametersCollectionRef.doc(configKey);
+    await refToDoc.update(configObject);
+
+    res.status(200).send(configObject);
+  } catch (error) {
+    console.error("Error updating document:", error);
+    res.status(500).send({ error: "Failed to update configuration." });
+  }
 });
 
 const PORT = process.env.PORT || 3000;

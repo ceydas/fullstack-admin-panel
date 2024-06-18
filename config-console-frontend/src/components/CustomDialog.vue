@@ -2,14 +2,14 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  parameter: Object
+  error_message: String
 })
 </script>
 
 <template>
   <div class="modal-overlay">
     <div class="modal">
-      <h2>Are you sure you want to delete this value parameter?</h2>
+      <h2 v-show="props.error_message"></h2>
       <div class="buttons">
         <button class="close-button" @click="close">Close</button>
         <button class="save-button" @click="saveEdit">Save</button>

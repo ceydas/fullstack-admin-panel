@@ -1,14 +1,24 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import deepClone from '../util/config-util'
+import { reactive, ref, watch } from 'vue'
+import { deepClone } from '@/util/config-util'
 
 const props = defineProps({
   parameter: Object
 })
+const parameterKey = ref(props.parameter?.key ?? '')
 
-const editData = ref(deepClone({ ...props.parameter }))
+const emptyValueAndTagData = { value_tag: 'default', value: '' }
 
-const addValueAndTagData = ref({ value_tag: 'default', value: '' })
+var finalValueAndTagData = {
+  key: parameterKey.value,
+  value: [{ value_tag: '', value: '' }],
+  description: '',
+  createDate: ''
+}
+
+const editData = reactive(deepClone({ ...props.parameter }))
+
+const addValueAndTagData = reactive(emptyValueAndTagData)
 
 const emit = defineEmits(['close', 'save'])
 
@@ -16,24 +26,31 @@ const close = () => {
   emit('close')
 }
 
-watch(props, (newVal) => {
-  editData.value = { ...newVal.parameter }
-  addValueAndTagData.value = { value_tag: 'default', value: '' }
-})
+watch(
+  () => props.parameter,
+  (newVal) => {
+    Object.assign(editData, newVal)
+    Object.assign(addValueAndTagData, emptyValueAndTagData)
+  },
+  { immediate: true, deep: true }
+)
 
 const saveEdit = () => {
-  emit('save', editData.value)
+  finalValueAndTagData.key = editData.key
+  Object.assign(finalValueAndTagData.value, editData.value)
+  finalValueAndTagData.description = editData.description
+  emit('save', finalValueAndTagData)
 }
 
 const addValueAndTag = () => {
-  if (editData.value.value[0].value) {
-    editData.value.value.push({ ...addValueAndTagData.value })
-    addValueAndTagData.value = { value_tag: 'default', value: '' }
+  if (editData.value[0].value) {
+    editData.value.push({ ...addValueAndTagData })
+    Object.assign(addValueAndTagData, emptyValueAndTagData)
   }
 }
 
 const deleteValueAndTag = (index: number) => {
-  editData.value.value.splice(index, 1)
+  editData.value.splice(index, 1)
 }
 </script>
 
@@ -42,8 +59,7 @@ const deleteValueAndTag = (index: number) => {
     <div class="modal">
       <h2>Edit Parameters</h2>
       <div class="input-item">
-        <p class="input-title">Parameter Key:</p>
-        <input v-model="editData.key" placeholder="Edit Parameter Key" />
+        <p class="input-title">Parameter Key: {{ parameterKey }}</p>
       </div>
       <br />
       <div class="input-item">

@@ -8,9 +8,23 @@ import authenticatedRequest from '../middleware/config-middleware'
 
 const isModalActive = ref(false)
 
-const isDialogActive = ref(false)
+const editIndex = ref(-1) // Currently edited parameter index
 
-const user = ref<User | null>(null)
+const user = ref<User | null>(null) // Reference to the current user, we need their token
+
+const parameters = reactive<Parameter[]>([]) // Parameters to display to the user
+
+const emptyParameters: Parameter = {
+  key: '',
+  value: [{ value_tag: 'default', value: '' }],
+  description: '',
+  createDate: ''
+}
+
+// Parameters in the input field
+const newParameter = reactive<Parameter>({...emptyParameters})
+
+const currentParameters = reactive<Parameter>({ ...emptyParameters })
 
 const showModal = (index: number) => {
   editIndex.value = index
@@ -21,23 +35,44 @@ const showModal = (index: number) => {
 const closeModal = () => {
   isModalActive.value = false
   editIndex.value = -1
-  Object.assign(currentParameters, newParameter)
+  Object.assign(currentParameters, {...emptyParameters})
 }
 
-const saveEdit = (updatedParameter: Parameter) => {
-  parameters.splice(editIndex.value, 1, { ...updatedParameter }) // Using splice for reactivity
+/* Called when user edits the modal data and clicks save */
+const saveEdit = async (updatedParameter: Parameter) => {
+  try {
+    if (user.value) {
+      const token = await user.value.getIdToken(true)
+
+      updatedParameter.createDate = getCurrentTime()
+
+      const response = await authenticatedRequest(
+        token,
+        `/configs/${updatedParameter.key}`,
+        'PUT',
+        updatedParameter
+      )
+      console.log(response)
+      parameters.splice(editIndex.value, 1, { ...updatedParameter })
+    } else {
+      console.error('User is not authenticated')
+    }
+  } catch (error) {
+    console.error('Error fetching parameters: ', error)
+  }
+
   closeModal()
 }
 
-const parameters = reactive<Parameter[]>([])
+/* Asynchronous functions */
 
+/* Fetch parameters from DB when page is mounted */
 const fetchParameters = async () => {
   try {
     if (user.value) {
       // <-- null check
       const token = await user.value.getIdToken(true) // <-- getIdToken usage
       const response = await authenticatedRequest(token, '/configs', 'GET')
-      console.log(response)
       parameters.splice(0, parameters.length, ...response) // Reactive assignment
     } else {
       console.error('User is not authenticated')
@@ -62,15 +97,7 @@ onMounted(async () => {
   })
 })
 
-const newParameter = reactive({
-  key: '',
-  value: [{ value_tag: '', value: '' }],
-  description: '',
-  createDate: ''
-})
-
-const currentParameters = reactive({ ...newParameter.value })
-
+/* Called when user enters valid parameter fields and clicks the add button */
 const addParameter = async () => {
   try {
     if (user.value) {
@@ -84,14 +111,10 @@ const addParameter = async () => {
         }
 
         const response = await authenticatedRequest(token, '/configs', 'POST', newParameter)
-        console.log(response)
         parameters.push({ ...newParameter })
-        Object.assign(newParameter, {
-          key: '',
-          value: [{ value_tag: '', value: '' }],
-          description: '',
-          createDate: ''
-        })
+
+        // reset 'newparameter'
+        Object.assign(newParameter, {...emptyParameters})
       } else {
         console.error('User is not authenticated')
       }
@@ -101,29 +124,26 @@ const addParameter = async () => {
   }
 }
 
-const editIndex = ref(-1)
+const deleteParameter = async (index: number) => {
+  try {
+    if (user.value) {
+      const token = await user.value.getIdToken(true)
 
-const editParameterData = ref({
-  key: '',
-  value: [{ value_tag: '', value: '' }],
-  description: '',
-  createDate: ''
-})
+      const currentKey = parameters[index].key
 
-const editParameter = (index: number) => {
-  editParameterData.value = { ...parameters[index] }
-  editIndex.value = -1
-}
-const saveParameter = (index: number) => {
-  parameters[index] = { ...editParameterData.value }
-  editIndex.value = -1
-  // todo
-}
-
-const deleteParameter = (index: number) => {
-  parameters.splice(index, 1)
-
-  //todo: send backend api delete request
+      if (currentKey) {
+        const response = await authenticatedRequest(token, `/configs/${currentKey}`, 'DELETE')
+        console.log(response)
+        parameters.splice(index, 1)
+        // reset 'newparameter'
+        Object.assign(newParameter, {...emptyParameters})
+      } else {
+        console.error('User is not authenticated')
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching parameters: ', error)
+  }
 }
 </script>
 
@@ -200,14 +220,6 @@ const deleteParameter = (index: number) => {
             @save="saveEdit"
           />
           <button @click="deleteParameter(index)" class="delete-btn">Delete</button>
-        </div>
-        <div v-if="editIndex === index" class="edit-form">
-          <input v-model="editParameterData.key" placeholder="Edit Parameter Key" />
-          <input v-model="editParameterData.value" placeholder="Edit Value" />
-          <input v-model="editParameterData.description" placeholder="Edit Description" />
-          <input v-model="editParameterData.createDate" placeholder="Edit Create Date" />
-          <button @click="saveParameter(index)" class="save-btn">Save</button>
-          <button class="cancel-btn">Cancel</button>
         </div>
       </div>
       <div class="card add-card">
