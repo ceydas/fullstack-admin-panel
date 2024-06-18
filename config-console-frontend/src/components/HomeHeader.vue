@@ -7,7 +7,6 @@ import { useRouter } from 'vue-router'
 
 const isLoggedIn = ref(false)
 const router = useRouter()
-const dropdownClicked = ref(false)
 
 let auth: Auth
 onMounted(() => {
@@ -27,9 +26,6 @@ const handleSignOut = () => {
   })
 }
 
-const toggleDropdown = () => {
-  dropdownClicked.value = !dropdownClicked.value
-}
 </script>
 
 <template>
@@ -61,7 +57,7 @@ const toggleDropdown = () => {
   align-items: center;
 }
 
-.sign-out{
+.sign-out {
   height: 1.7vw;
   min-height: 24px;
 }

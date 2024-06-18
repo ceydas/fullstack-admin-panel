@@ -1,0 +1,17 @@
+{
+  "name": "config-backend",
+  "version": "1.0.0",
+  "main": "firebase.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "firebase": "^10.12.2",
+    "firebase-admin": "^12.1.1",
+    "typescript": "^5.4.5"
+  }
+}

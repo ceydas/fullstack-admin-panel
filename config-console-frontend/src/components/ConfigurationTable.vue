@@ -1,103 +1,92 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { auth } from '../main'
+import { getAuth, onAuthStateChanged, type User } from 'firebase/auth'
 import CustomModal from './CustomModal.vue'
+import getCurrentTime from '@/util/config-util'
+import type { Parameter } from '@/types/Parameter'
+import authenticatedRequest from '../middleware/config-middleware'
+import axios from 'axios'
 
 const isModalActive = ref(false)
 
 const isDialogActive = ref(false)
 
+const user = ref<User | null>(null)
+
 const showModal = (index: number) => {
   editIndex.value = index
-  currentParameters.value = { ...parameters.value[index] }
+  Object.assign(currentParameters, parameters[index])
   isModalActive.value = true
-}
-
-const showDialog = () => {
-  isDialogActive.value = true
 }
 
 const closeModal = () => {
   isModalActive.value = false
   editIndex.value = -1
-  currentParameters.value = { ...newParameter.value }
+  Object.assign(currentParameters, newParameter)
 }
 
-const saveEdit = (updatedParameter: Object) => {
-  parameters.value[editIndex.value] = { ...updatedParameter }
+const saveEdit = (updatedParameter: Parameter) => {
+  parameters.splice(editIndex.value, 1, { ...updatedParameter }) // Using splice for reactivity
   closeModal()
 }
 
-const parameters = ref([
-  {
-    key: 'min_version',
-    value: [{ value_tag: 'default', value: '1.4.4' }],
-    description: 'Minimum required version of the app',
-    createDate: '10/05/2021 01:58'
-  },
-  {
-    key: 'latest_version',
-    value: [{ value_tag: 'default', value: '1.4.7' }],
-    description: 'Latest version of the app',
-    createDate: '10/05/2021 01:58'
-  },
-  {
-    key: 'pricing_tier',
-    value: [
-      { value_tag: 'default', value: '16' },
-      { value_tag: 'TR', value: '20' },
-      { value_tag: 'US', value: '10' },
-      { value_tag: 'DEU', value: '20' },
-      { value_tag: 'FR', value: '20' },
-      { value_tag: 'TR', value: '20' },
-      { value_tag: 'BR', value: '19' },
-      { value_tag: 'NL', value: '13' },
-      { value_tag: 'DEN', value: '11' }
-    ],
-    description: 'Pricing tier of the user',
-    createDate: '07/07/2021 11:13'
-  },
-  {
-    key: 'scroll',
-    value: [{ value_tag: 'default', value: '5' }],
-    description: 'Index of Scroll Paywall for free users.',
-    createDate: '25/08/2021 10:22'
-  },
-  {
-    key: 'scroll_limit',
-    value: [{ value_tag: 'default', value: '13' }],
-    description: 'Index of Scroll Limit Paywall for free users.',
-    createDate: '25/08/2021 10:23'
-  }
-])
+const parameters = reactive<Parameter[]>([])
 
-const newParameter = ref({
+const fetchParameters = async () => {
+  try {
+    if (user.value) {
+      // <-- null check
+      const token = await user.value.getIdToken(true) // <-- getIdToken usage
+      const response = await authenticatedRequest(token, '/configs', 'GET')
+      console.log(response)
+      parameters.splice(0, parameters.length, ...response) // Reactive assignment
+    } else {
+      console.error('User is not authenticated')
+    }
+  } catch (error) {
+    console.error('Error fetching parameters: ', error)
+  }
+}
+
+onMounted(async () => {
+  const auth = getAuth()
+  // Firebase auth state change listener
+  await onAuthStateChanged(auth, (authUser) => {
+    // <-- added auth state listener
+    if (authUser) {
+      user.value = authUser
+      fetchParameters()
+    } else {
+      // Handle user not authenticated
+      console.log('User not authenticated')
+    }
+  })
+})
+
+const newParameter = reactive({
   key: '',
   value: [{ value_tag: '', value: '' }],
   description: '',
   createDate: ''
 })
 
-const currentParameters = ref({ ...newParameter.value })
+const currentParameters = reactive({ ...newParameter.value })
 
 const addParameter = () => {
-  if (
-    newParameter.value.key &&
-    newParameter.value.value[0].value &&
-    newParameter.value.description
-  ) {
-    newParameter.value.createDate = getCurrentTime()
-    if (newParameter.value.value[0].value_tag == '') {
-      newParameter.value.value[0].value_tag = 'default'
+  if (newParameter.key && newParameter.value[0].value && newParameter.description) {
+    newParameter.createDate = getCurrentTime()
+    //TODO: send backend api post request
+    if (newParameter.value[0].value_tag == '') {
+      newParameter.value[0].value_tag = 'default'
     }
-    parameters.value.push({ ...newParameter.value })
-    newParameter.value = {
+    parameters.push({ ...newParameter })
+    Object.assign(newParameter, {
       key: '',
       value: [{ value_tag: '', value: '' }],
       description: '',
       createDate: ''
-    }
-
-    //todo: send backend api post request
+    })
   }
 }
 
@@ -111,32 +100,19 @@ const editParameterData = ref({
 })
 
 const editParameter = (index: number) => {
-  editParameterData.value = { ...parameters.value[index] }
+  editParameterData.value = { ...parameters[index] }
   editIndex.value = -1
 }
 const saveParameter = (index: number) => {
-  parameters.value[index] = { ...editParameterData.value }
+  parameters[index] = { ...editParameterData.value }
   editIndex.value = -1
   // todo
 }
 
 const deleteParameter = (index: number) => {
-  parameters.value.splice(index, 1)
+  parameters.splice(index, 1)
 
   //todo: send backend api delete request
-}
-
-function getCurrentTime(): string {
-  const now = new Date()
-
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  const year = now.getFullYear()
-
-  const hours = String(now.getHours()).padStart(2, '0')
-  const minutes = String(now.getMinutes()).padStart(2, '0')
-
-  return `${month}/${day}/${year} ${hours}:${minutes}`
 }
 </script>
 

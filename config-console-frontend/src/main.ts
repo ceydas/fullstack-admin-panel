@@ -2,10 +2,11 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
+import { getAuth } from 'firebase/auth'
 import App from './App.vue'
 import router from './router'
 import { initializeApp } from 'firebase/app'
+import { getFirestore } from 'firebase/firestore'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,9 @@ const firebaseConfig = {
 }
 
 const init = initializeApp(firebaseConfig)
+const db = getFirestore(init)
+const auth = getAuth(init)
+
 console.log(init)
 const app = createApp(App)
 
@@ -25,3 +29,5 @@ app.use(createPinia())
 app.use(router)
 
 app.mount('#app')
+
+export { db, auth }

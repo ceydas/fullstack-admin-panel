@@ -28,6 +28,8 @@ const router = createRouter({
   ]
 })
 
+
+
 const getCurrentUser = () => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
@@ -55,3 +57,6 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export default router
+
+
+
