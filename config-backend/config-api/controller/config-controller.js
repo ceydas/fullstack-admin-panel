@@ -1,6 +1,9 @@
 import express from "express";
 import { db } from "../../firebase.js";
-import { authenticateToken } from "../middleware/config-middleware.js";
+import {
+  authenticateToken,
+  authenticateAdmin,
+} from "../middleware/config-middleware.js";
 import createServingApiResponse from "./response-util.js";
 const app = express();
 const port = 8383;
@@ -35,7 +38,8 @@ app.get("/configs/country/", (req, res) => {
   return res.redirect("/configs/country/default");
 });
 
-app.get("/configs", authenticateToken, async (req, res) => {
+// Get all configs - admin only
+app.get("/configs", authenticateAdmin, async (req, res) => {
   var snapshot = await configParametersCollectionRef.get();
   if (snapshot.empty) {
     console.log("No matching documents.");
@@ -50,7 +54,7 @@ app.get("/configs", authenticateToken, async (req, res) => {
   return res.status(200).send(documents);
 });
 
-app.post("/configs", authenticateToken, async (req, res) => {
+app.post("/configs", authenticateAdmin, async (req, res) => {
   const configObject = req.body;
 
   if (!configObject) {
@@ -65,7 +69,7 @@ app.post("/configs", authenticateToken, async (req, res) => {
   res.status(200).send(configObject);
 });
 
-app.delete("/configs/:key", authenticateToken, async (req, res) => {
+app.delete("/configs/:key", authenticateAdmin, async (req, res) => {
   const { key } = req.params;
 
   if (!key) {
@@ -82,7 +86,7 @@ app.delete("/configs/:key", authenticateToken, async (req, res) => {
  *  configuration parameters for a specified country,
  * or default parameters if a country is not specified. **/
 
-app.get("/configs/country/:country", async (req, res) => {
+app.get("/configs/country/:country", authenticateToken, async (req, res) => {
   const { country } = req.params;
   const country_param = country || "default";
   var snapshot = await configParametersCollectionRef.get();
@@ -96,7 +100,7 @@ app.get("/configs/country/:country", async (req, res) => {
   return res.status(200).send(response);
 });
 
-app.put("/configs/:key", authenticateToken, async (req, res) => {
+app.put("/configs/:key", authenticateAdmin, async (req, res) => {
   const configKey = req.params.key;
   const configObject = req.body;
 

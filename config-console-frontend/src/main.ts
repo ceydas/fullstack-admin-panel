@@ -22,6 +22,11 @@ const init = initializeApp(firebaseConfig)
 const db = getFirestore(init)
 const auth = getAuth(init)
 
+const getUserData = async (uid: String) => {
+  const userDoc = await getDoc(doc(db, 'users', uid))
+  return userDoc.exists() ? userDoc.data() : null
+}
+
 console.log(init)
 const app = createApp(App)
 
