@@ -2,6 +2,12 @@
 Responsive admin configuration management panel and REST API for serving app logic and UI configurations for Codeway applications.
 VueJS 3 for the front end and NodeJS for the back end are used.
 
+## 🚨 Important notes for the reader:
+- Due to the Eid Holidays, I updated the code and the README after the submission deadline (Jun 18).
+- In total, I did restrict myself to 7 full working days.
+- If that's a deal breaker, you can view my PDF project document for the latest version before the submission deadline (attached to my submission e-mail).
+- If not, you can view the small changes to the code from the 'deploy' branch and continue to read on 🍀
+
 ## Quick Start
 - Go to https://codeway-fullstack-case-b9901.web.app which will redirect you to /signin
 - Try to sign in as regular-user@gmail.com 
@@ -96,7 +102,6 @@ The backend verifies the user token sent via request headers before performing f
 
 ### Endpoints Available for Regular Users:
 - `GET ‘/configs/country/{country}` Get all configuration parameters for a specified country, or default parameters if a country is not specified.
-
 
 ## Areas of Improvement
 * Error handling and warning dialogs.
