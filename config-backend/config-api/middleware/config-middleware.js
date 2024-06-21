@@ -4,6 +4,8 @@ export const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
+  console.log("Header:", authHeader, " token: ", token)
+
   if (token == null) {
     return res.status(401).send("No token found"); // No token found
   }
@@ -21,12 +23,14 @@ export const authenticateToken = async (req, res, next) => {
 };
 
 export const authenticateAdmin = async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split("Bearer ")[1];
+
+  console.log("Header: " ,authHeader);
 
   try {
     // Verify the token and get user UID
-    const decodedToken = await admin.auth().verifyIdToken(bearerToken);
+    const decodedToken = await admin.auth().verifyIdToken(token);
     const uid = decodedToken.uid;
 
     // Fetch the user's document from Firestore
@@ -40,6 +44,7 @@ export const authenticateAdmin = async (req, res, next) => {
 
     // Check if the user is an admin
     if (userData.isAdmin) {
+      admin.auth().setCustomUserClaims(uid, { admin: true });
       req.user = userData; // Attach user data to the request
       next();
     } else {

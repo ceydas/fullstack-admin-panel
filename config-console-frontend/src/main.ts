@@ -1,12 +1,11 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
 import { getAuth } from 'firebase/auth'
 import App from './App.vue'
 import router from './router'
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore, doc, getDoc } from 'firebase/firestore'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -22,7 +21,7 @@ const init = initializeApp(firebaseConfig)
 const db = getFirestore(init)
 const auth = getAuth(init)
 
-const getUserData = async (uid: String) => {
+const getUserData = async (uid: string) => {
   const userDoc = await getDoc(doc(db, 'users', uid))
   return userDoc.exists() ? userDoc.data() : null
 }
@@ -30,9 +29,8 @@ const getUserData = async (uid: String) => {
 console.log(init)
 const app = createApp(App)
 
-app.use(createPinia())
 app.use(router)
 
 app.mount('#app')
 
-export { db, auth }
+export { db, auth, getUserData }

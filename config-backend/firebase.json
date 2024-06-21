@@ -1,0 +1,5 @@
+{
+  "hosting": {
+    "source": "../config-api/controller/config-controller.js"
+  }
+}

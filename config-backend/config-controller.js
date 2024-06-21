@@ -1,20 +1,21 @@
 import express from "express";
-import { db } from "../../firebase.js";
+import { db } from "./firebase.js";
 import {
   authenticateToken,
   authenticateAdmin,
-} from "../middleware/config-middleware.js";
-import createServingApiResponse from "./response-util.js";
-const app = express();
-const port = 8383;
+} from "./config-api/middleware/config-middleware.js";
+import createServingApiResponse from "./config-api/controller/response-util.js";
 
+const app = express();
+const apiRouter = express.Router();
+const allowedOrigin = process.env.CLIENT_URL;
 const configParametersCollectionRef = db.collection("config-parameters");
 
 app.use(express.json());
 
 // Set CORS headers for all routes
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  if (allowedOrigin) res.header("Access-Control-Allow-Origin", allowedOrigin);
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
@@ -25,7 +26,7 @@ app.use((req, res, next) => {
 
 // Handle preflight requests
 app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header("Access-Control-Allow-Origin", allowedOrigin);
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
