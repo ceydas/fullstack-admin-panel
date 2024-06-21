@@ -23,20 +23,20 @@ const emptyParameters: Parameter = {
 }
 
 // Parameters in the input field
-const newParameter = reactive<Parameter>(deepClone({...emptyParameters}))
+const newParameter = reactive<Parameter>(deepClone({ ...emptyParameters }))
 
 const currentParameters = reactive<Parameter>(deepClone({ ...emptyParameters }))
 
 const showModal = (index: number) => {
   editIndex.value = index
-  Object.assign(currentParameters, parameters[index])
+  Object.assign(currentParameters, deepClone({ ...parameters[index] }))
   isModalActive.value = true
 }
 
 const closeModal = () => {
   isModalActive.value = false
   editIndex.value = -1
-  Object.assign(currentParameters, deepClone({...emptyParameters}))
+  Object.assign(currentParameters, deepClone({ ...emptyParameters }))
 }
 
 /* Called when user edits the modal data and clicks save */
@@ -115,7 +115,7 @@ const addParameter = async () => {
         parameters.push({ ...newParameter })
 
         // reset 'newparameter'
-        Object.assign(newParameter,deepClone( {...emptyParameters}))
+        Object.assign(newParameter, deepClone({ ...emptyParameters }))
       } else {
         console.error('User is not authenticated')
       }
@@ -137,7 +137,7 @@ const deleteParameter = async (index: number) => {
         console.log(response)
         parameters.splice(index, 1)
         // reset 'newparameter'
-        Object.assign(newParameter, deepClone({...emptyParameters}))
+        Object.assign(newParameter, deepClone({ ...emptyParameters }))
       } else {
         console.error('User is not authenticated')
       }
