@@ -10,8 +10,9 @@ VueJS 3 for the front end and NodeJS for the back end are used.
 
 ## Quick Start
 - Go to https://codeway-fullstack-case-b9901.web.app which will redirect you to /signin
-- Try to sign in as regular-user@gmail.com 
-- Try to sign in as admin@codeway.com
+- Try to sign in as regular-user@gmail.com with password as "password"
+- Try to sign in as invalid-user@gmail.com
+- Try to sign in as admin@codeway.com with password as "password"
 - You can modify the configurations if you have admin access.
 
 ## Do It Yourself Deployment
