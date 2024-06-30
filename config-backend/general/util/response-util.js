@@ -12,7 +12,6 @@ export default function createServingApiResponse(
     console.log("Data:", data);
 
     const filteredValue = filterByValueTag(data, countryParam);
-    console.log("Filtered:", filteredValue);
     if (filteredValue.length > 0) {
       result[data.key] = filteredValue[0];
     }

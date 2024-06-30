@@ -3,7 +3,7 @@ import 'dotenv'
 
 const _BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-//TODO add endpoint
+
 export default async function authenticatedRequest(token : string, endpoint : string, method : string, data = {}) {
   try {
     const response_body = {

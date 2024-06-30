@@ -5,6 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import dotenv from "dotenv";
 
 dotenv.config();
+const config = process.env.FIREBASE_PROJECT_ID;
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 // Initialize Firebase
 admin.initializeApp({
