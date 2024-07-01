@@ -118,13 +118,13 @@ VITE_BACKEND_URL = "backend_url_app_engine"
 - Access the hosting URL from the given address in the console.
 
 ## Overview
-* Given the time constraint, in order to keep things simple, two separate services **frontend** and **backend** were used since separating the backend service into admin and user would introduce additional complexity due to separating databases and additional HTTP communication.
+* Two separate services **frontend** and **backend** were used.
+* `/api/admin` : Admin API
+* `/api/serving` : User (Serving) API
 
 * The frontend was tested for responsiveness on 10+ devices.
 
 * The frontend and backend communicate via **axios** using HTTP.
-
-* In order to handle concurrency issues such as 2 admins writing to the database at the same time, firebase transactions might have been used for isolation. However, I was not able to implement it due to my limited understanding of firebase transactions' locking mechanism. That's definitely an area of improvement.
 
 ## Endpoints
 The backend verifies the user token sent via request headers before performing firebase transactions.
@@ -140,7 +140,8 @@ The backend verifies the user token sent via request headers before performing f
 
 ## Areas of Improvement
 * Error handling and warning dialogs.
-* Hard coded error messages in the frontend
+* Hard coded error messages in the frontend.
+* Handling API key rotation and encryption.
 
 ## Front End Screenshots - Desktop
 
