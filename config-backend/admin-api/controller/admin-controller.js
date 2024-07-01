@@ -1,6 +1,5 @@
 import { AdminService } from "../service/admin-service.js";
 
-
 // Get all configs - admin only
 export const getAllConfigs = async (req, res) => {
   try {
@@ -26,10 +25,11 @@ export const postConfig = async (req, res) => {
 // Delete config - admin only
 export const deleteConfig = async (req, res) => {
   const { key } = req.params;
+  console.log(key);
 
   try {
     const snapshot = await AdminService.deleteConfig(key);
-    res.status(204).send("Deleted ", snapshot);
+    return res.status(204).send();
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }
@@ -41,7 +41,10 @@ export const updateConfig = async (req, res) => {
   const configObject = req.body;
 
   try {
-    const updatedObject = await AdminService.updateConfig(configKey, configObject);
+    const updatedObject = await AdminService.updateConfig(
+      configKey,
+      configObject
+    );
     return res.status(200).send(updatedObject);
   } catch (error) {
     res.status(500).send({ error: error.message });

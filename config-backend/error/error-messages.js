@@ -19,6 +19,9 @@ export const FIRESTORE_ERROR_MESSAGES = {
   UPDATE_ERROR: "Failed to update configuration.",
   CREATE_ERROR: "Failed to create new configuration.",
   DELETE_ERROR: "Failed to delete document.",
+  DOCUMENT_ALREADY_EXISTS: "Document already exists.",
+  NON_EXISTENT_DOCUMENT: "Document does not exist",
+  VERSION_MISMATCH: "Version mismatch error.",
 };
 
 export const REQUEST_ERROR_MESSAGES = {

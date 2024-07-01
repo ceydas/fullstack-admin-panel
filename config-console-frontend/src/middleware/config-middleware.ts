@@ -3,10 +3,14 @@ import 'dotenv'
 
 const _BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-
-export default async function authenticatedRequest(token : string, endpoint : string, method : string, data = {}) {
+export default async function authenticatedRequest(
+  token: string,
+  endpoint: string,
+  method: string,
+  data = {}
+) {
   try {
-    const response_body = {
+    const request_body = {
       url: `${_BACKEND_URL}${endpoint}`,
       method: method,
       headers: {
@@ -15,11 +19,12 @@ export default async function authenticatedRequest(token : string, endpoint : st
       },
       data: data
     }
-    console.log(response_body)
-    const response = await axios(response_body)
+    console.log(request_body)
+    const response = await axios(request_body)
+    console.log(response)
     return response.data
   } catch (error) {
     console.error('Error making authenticated request:', error)
-    throw error
+    throw Error('Error making authenticated request:')
   }
 }
