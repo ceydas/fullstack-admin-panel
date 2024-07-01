@@ -12,17 +12,44 @@ VueJS 3 for the front end and NodeJS for the back end are used.
 - Prevent duplicate value tags from the frontend (i.e. the admin cannot add 2 default values)
 - Added a loading icon
 
-## Quick Start
+## Quick Start - Admin Console
 - Go to https://codeway-fullstack-case-b9901.web.app which will redirect you to /signin
 - Try to sign in as regular-user@gmail.com with password as "password"
 - Try to sign in as invalid-user@gmail.com
 - Try to sign in as admin@codeway.com with password as "password"
 - You can modify the configurations if you have admin access.
 
+## Quick Start - Postman
+- Use the following endpoints:
+  - Header `x-api-key` : `DeYKkmxoj5cqIDMFbOwB`
+
+  - GET https://codeway-fullstack-case-b9901.ey.r.appspot.com/api/serving/configs/country
+    - Example response  ```{
+    "latest_version": "1.4.7",
+    "min_version": "1.4.3",
+    "premium_price": "13",
+    "pricing_tier": "5",
+    "scroll_limit": "13"
+}```
+
+  - GET https://codeway-fullstack-case-b9901.ey.r.appspot.com/api/serving/configs/country/TR (Use any country)
+    - Example response ```{
+    "country": "TR",
+    "latest_version": "1.4.7",
+    "min_version": "1.4.3",
+    "premium_price": "15",
+    "pricing_tier": "5",
+    "scroll_limit": "13"
+}```
+ 
+  - If the given country has special values set for a parameter key, they will be shown. Otherwise, the default values will be shown.
+  
+
 ## Do It Yourself Deployment
 ### Prerequisites
 - Create a project on Firebase.
-- Create database on Firestore called `config-parameters` and `users`.
+- Create database on Firestore called `config-parameters`,`api-keys` and `users`.
+- Create new API key.
 - Create an admin user and a regular user on Firebase Auth console, and save their UID along with an 'isAdmin' property to the `users` database.
 - Obtain project credentials from the console. 
   
@@ -103,14 +130,14 @@ VITE_BACKEND_URL = "backend_url_app_engine"
 The backend verifies the user token sent via request headers before performing firebase transactions.
 
 ### Endpoints Available for Admins:
-- `GET /configs` Get all configuration parameters. The result is an object array.
-- `GET /configs/country/{country}` Get all configuration parameters for a specified country, or default parameters if a country is not specified.
-- `POST /configs` Add new configuration parameter to the database, providing a request body of type ‘Parameter’.
-- `UPDATE /configs` Update existing configuration parameter, providing a request body of type ‘Parameter’.
-- `DELETE configs/{key}` Delete configuration parameter with the given key.
+- `GET /api/admin/configs` Get all configuration parameters. The result is an object array.
+- `GET /api/admin/configs/country/{country}` Get all configuration parameters for a specified country, or default parameters if a country is not specified.
+- `POST /api/admin/configs` Add new configuration parameter to the database, providing a request body of type ‘Parameter’.
+- `UPDATE /api/admin/configs` Update existing configuration parameter, providing a request body of type ‘Parameter’.
+- `DELETE /api/admin/configs/{key}` Delete configuration parameter with the given key.
 
 ### Endpoints Available for Regular Users:
-- `GET ‘/configs/country/{country}` Get all configuration parameters for a specified country, or default parameters if a country is not specified.
+- `GET /api/serving/configs/country/{country}` Get all configuration parameters for a specified country, or default parameters if a country is not specified.
 
 ## Areas of Improvement
 * Error handling and warning dialogs.
