@@ -132,7 +132,7 @@ The backend verifies the user token sent via request headers before performing f
 ### Endpoints Available for Admins:
 - `GET /api/admin/configs` Get all configuration parameters. The result is an object array.
 - `POST /api/admin/configs` Add new configuration parameter to the database, providing a request body of type ‘Parameter’.
-- `UPDATE /api/admin/configs` Update existing configuration parameter, providing a request body of type ‘Parameter’.
+- `PUT /api/admin/configs` Update existing configuration parameter, providing a request body of type ‘Parameter’.
 - `DELETE /api/admin/configs/{key}` Delete configuration parameter with the given key.
 
 ### Endpoints Available for Regular Users:
