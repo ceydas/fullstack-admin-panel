@@ -3,4 +3,5 @@ export interface Parameter {
   value: { value_tag: string; value: string }[]
   description: string
   createDate: string
+  version: number
 }

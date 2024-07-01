@@ -2,40 +2,49 @@
 import SigninButton from '../components/SigninButton.vue'
 import '../assets/base.css'
 
-import { ref} from 'vue'
+import { ref } from 'vue'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { useRouter } from 'vue-router'
-
 
 const email = ref('')
 const password = ref('')
 const errMsg = ref('')
 const router = useRouter()
 
-const signin = (): void => {
+const signin = async (): Promise<void> => {
   const auth = getAuth()
-  console.log(auth)
-  signInWithEmailAndPassword(auth, email.value, password.value)
-    .then(() => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
+
+    const user = userCredential.user
+    console.log(user)
+
+    // Get ID token
+    const idTokenResult = await user.getIdTokenResult()
+    const claims = idTokenResult.claims
+    if (claims.admin) {
+      console.log('User is an admin')
       router.push('/')
-    })
-    .catch((error) => {
-      console.log(error.code)
-      switch (error.code) {
-        case 'auth/invalid-email':
-          errMsg.value = 'Invalid email'
-          break
-        case 'auth/user-not-found':
-          errMsg.value = 'User not found'
-          break
-        case 'auth/wrong-password':
-          errMsg.value = 'Incorrect password'
-          break
-        default:
-          errMsg.value = 'Email or password was incorrect'
-          break
-      }
-    })
+    } else {
+      errMsg.value = 'Unauthorized access.'
+    }
+  } catch (error: any) {
+    console.log(error.code)
+    switch (error.code) {
+      case 'auth/invalid-email':
+        errMsg.value = 'Invalid email'
+        break
+      case 'auth/user-not-found':
+        errMsg.value = 'User not found'
+        break
+      case 'auth/wrong-password':
+        errMsg.value = 'Incorrect password'
+        break
+      default:
+        errMsg.value = 'Email or password was incorrect'
+        break
+    }
+  }
 }
 </script>
 

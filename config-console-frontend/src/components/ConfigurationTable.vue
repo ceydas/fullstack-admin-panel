@@ -6,8 +6,11 @@ import getCurrentTime from '@/util/config-util'
 import type { Parameter } from '@/types/Parameter'
 import authenticatedRequest from '../middleware/config-middleware'
 import { deepClone } from '@/util/config-util'
+import LoadingIcon from './LoadingIcon.vue'
 
 const isModalActive = ref(false)
+
+const fetchLoading = ref(false)
 
 const editIndex = ref(-1) // Currently edited parameter index
 
@@ -19,24 +22,25 @@ const emptyParameters: Parameter = {
   key: '',
   value: [{ value_tag: 'default', value: '' }],
   description: '',
-  createDate: ''
+  createDate: '',
+  version: -1
 }
 
 // Parameters in the input field
-const newParameter = reactive<Parameter>(deepClone({...emptyParameters}))
+const newParameter = reactive<Parameter>(deepClone({ ...emptyParameters }))
 
 const currentParameters = reactive<Parameter>(deepClone({ ...emptyParameters }))
 
 const showModal = (index: number) => {
   editIndex.value = index
-  Object.assign(currentParameters, parameters[index])
+  Object.assign(currentParameters, deepClone({ ...parameters[index] }))
   isModalActive.value = true
 }
 
 const closeModal = () => {
   isModalActive.value = false
   editIndex.value = -1
-  Object.assign(currentParameters, deepClone({...emptyParameters}))
+  Object.assign(currentParameters, deepClone({ ...emptyParameters }))
 }
 
 /* Called when user edits the modal data and clicks save */
@@ -46,20 +50,23 @@ const saveEdit = async (updatedParameter: Parameter) => {
       const token = await user.value.getIdToken(true)
 
       updatedParameter.createDate = getCurrentTime()
+      updatedParameter.version = parameters[editIndex.value].version
 
-      const response = await authenticatedRequest(
+      await authenticatedRequest(
         token,
         `/configs/${updatedParameter.key}`,
         'PUT',
         updatedParameter
       )
-      console.log(response)
+
       parameters.splice(editIndex.value, 1, { ...updatedParameter })
+      parameters[editIndex.value].version++
     } else {
       console.error('User is not authenticated')
     }
-  } catch (error) {
-    console.error('Error fetching parameters: ', error)
+  } catch (error: any) {
+    alert('Version mismatch detected. Force refresh is required.')
+    window.location.reload()
   }
 
   closeModal()
@@ -70,6 +77,7 @@ const saveEdit = async (updatedParameter: Parameter) => {
 /* Fetch parameters from DB when page is mounted */
 const fetchParameters = async () => {
   try {
+    fetchLoading.value = true //Start loading
     if (user.value) {
       // <-- null check
       const token = await user.value.getIdToken(true) // <-- getIdToken usage
@@ -80,13 +88,15 @@ const fetchParameters = async () => {
     }
   } catch (error) {
     console.error('Error fetching parameters: ', error)
+  } finally {
+    fetchLoading.value = false //Stop loading
   }
 }
 
 onMounted(async () => {
   const auth = getAuth()
   // Firebase auth state change listener
-  await onAuthStateChanged(auth, (authUser) => {
+  onAuthStateChanged(auth, (authUser) => {
     // <-- added auth state listener
     if (authUser) {
       user.value = authUser
@@ -111,11 +121,11 @@ const addParameter = async () => {
           newParameter.value[0].value_tag = 'default'
         }
 
-        const response = await authenticatedRequest(token, '/configs', 'POST', newParameter)
+        await authenticatedRequest(token, '/configs', 'POST', newParameter)
         parameters.push({ ...newParameter })
 
         // reset 'newparameter'
-        Object.assign(newParameter,deepClone( {...emptyParameters}))
+        Object.assign(newParameter, deepClone({ ...emptyParameters }))
       } else {
         console.error('User is not authenticated')
       }
@@ -133,11 +143,10 @@ const deleteParameter = async (index: number) => {
       const currentKey = parameters[index].key
 
       if (currentKey) {
-        const response = await authenticatedRequest(token, `/configs/${currentKey}`, 'DELETE')
-        console.log(response)
+        await authenticatedRequest(token, `/configs/${currentKey}`, 'DELETE')
         parameters.splice(index, 1)
         // reset 'newparameter'
-        Object.assign(newParameter, deepClone({...emptyParameters}))
+        Object.assign(newParameter, deepClone({ ...emptyParameters }))
       } else {
         console.error('User is not authenticated')
       }
@@ -149,6 +158,7 @@ const deleteParameter = async (index: number) => {
 </script>
 
 <template>
+  <LoadingIcon v-if="fetchLoading" />
   <div class="config-page-container">
     <div class="table-container">
       <div class="table-header">Parameter Key</div>

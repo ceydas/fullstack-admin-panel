@@ -13,6 +13,7 @@
 
   --vt-c-black-transparent: #00000047;
 
+  --vt-c-error-red: #db3f30;
   --vt-c-indigo: #32335a;
 
   --vt-c-dark-grey: #6a778c;
@@ -44,27 +45,17 @@
 
   --color-button-text: var(var(--vt-c-white));
 
+  --color-error-text: var(--vt-c-error-red);
+
   --gradient-edit-button: linear-gradient(45deg, #3960eb, #3f88ef);
   --gradient-delete-button: linear-gradient(45deg, #db3f30, #e8658d);
   --gradient-add-button: linear-gradient(45deg, #45a0e4, #6ae8c6);
-  --gradient-tag: linear-gradient(45deg, #5500C9, #7F26F7);
+  --gradient-tag: linear-gradient(45deg, #5500c9, #7f26f7);
 }
 
 body {
   color: var(--color-text);
   background: var(--color-background);
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   font-size: 20px;
 }

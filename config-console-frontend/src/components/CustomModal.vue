@@ -16,6 +16,8 @@ var finalValueAndTagData = {
   createDate: ''
 }
 
+const errorSaving = ref(false)
+
 const editData = reactive(deepClone({ ...props.parameter }))
 
 const addValueAndTagData = reactive(emptyValueAndTagData)
@@ -43,9 +45,22 @@ const saveEdit = () => {
 }
 
 const addValueAndTag = () => {
-  if (editData.value[0].value) {
-    editData.value.push({ ...addValueAndTagData })
-    Object.assign(addValueAndTagData, emptyValueAndTagData)
+  let currentValueTag = addValueAndTagData.value_tag
+
+  console.log(currentValueTag)
+
+  if (currentValueTag) {
+    let tagExists = editData.value.some(
+      (item: { value_tag: string }) => item.value_tag === currentValueTag
+    )
+    console.log(tagExists)
+    if (!tagExists) {
+      editData.value.push({ ...addValueAndTagData })
+      Object.assign(addValueAndTagData, emptyValueAndTagData)
+    }
+    else {
+      alert("A value parameter with the same tag already exists.")
+    }
   }
 }
 
@@ -82,6 +97,9 @@ const deleteValueAndTag = (index: number) => {
       <br />
       <input v-model="editData.description" placeholder="Edit Description" />
       <br />
+      <div v-if="errorSaving">
+        <p class="update-error">Error</p>
+      </div>
       <div class="buttons">
         <button class="close-button" @click="close">Close</button>
         <button class="save-button" @click="saveEdit">Save</button>
@@ -240,6 +258,13 @@ input:focus {
   display: flex;
   justify-content: center;
   gap: 10px;
+}
+
+.update-error {
+  display: flex;
+  justify-content: center;
+  color: var(--color-error-text);
+  font-weight: 400;
 }
 
 @media (max-width: 700px) {

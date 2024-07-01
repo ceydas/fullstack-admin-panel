@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import {db, auth} from '../main'
+import { getAuth, onAuthStateChanged, type User } from 'firebase/auth'
+import { db, auth, getUserData } from '../main'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,14 +11,14 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
       meta: {
-        requiresAuth: true
+        requiresAdmin: true
       }
     },
     {
       path: '/signin',
       name: 'signin',
       meta: {
-        requiresAuth: false
+        requiresAdmin: false
       },
 
       // route level code-splitting
@@ -28,8 +28,7 @@ const router = createRouter({
     }
   ]
 })
-
-const getCurrentUser = () => {
+const getCurrentUser = (): Promise<User | null> => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
       getAuth(),
@@ -37,28 +36,22 @@ const getCurrentUser = () => {
         removeListener()
         resolve(user)
       },
-
       reject
     )
   })
 }
 
-
-
+// Navigation Guard
 router.beforeEach(async (to, from, next) => {
   const currentUser = await getCurrentUser()
 
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAdmin)) {
     if (currentUser) {
-      if (to.matched.some((record) => record.meta.requiresAdmin)) {
-        const userData = await getUserData(currentUser.uid)
-        if (userData?.isAdmin) {
-          next()
-        } else {
-          next('/signin')
-        }
-      } else {
+      const idTokenResult = await currentUser.getIdTokenResult()
+      if (idTokenResult.claims.admin) {
         next()
+      } else {
+        next('/signin')
       }
     } else {
       next('/signin')

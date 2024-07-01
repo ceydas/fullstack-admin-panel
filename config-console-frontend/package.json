@@ -1,6 +1,6 @@
 {
   "name": "config-console-frontend",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,7 +15,8 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "firebase": "^10.12.2",
-    "pinia": "^2.1.7",
+    "firebase-tools": "^13.11.3",
+    "g": "^2.0.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
