@@ -2,11 +2,15 @@
 Responsive admin configuration management panel and REST API for serving app logic and UI configurations for Codeway applications.
 VueJS 3 for the front end and NodeJS for the back end are used.
 
-## 🚨 Important notes for the reader:
-- Due to the Eid Holidays, I updated the code and the README after the submission deadline (Jun 18).
-- In total, I did restrict myself to 7 full working days.
-- If that's a deal breaker, you can view my PDF project document for the latest version before the submission deadline (attached to my submission e-mail).
-- If not, you can view the small changes to the code from the 'deploy' branch and continue to read on 🍀
+## 🆕 What's New? Revision (July 1, 2024)
+- Improved backend folder structure by separating admin from user (serving api) and controller from service. 
+- Added 'routes' to differentiate user (serving) API from admin API. 
+- Added x-api-key header check for serving API. 
+- Eliminated hard coded error messages in the backend. 
+- Fixed HTTP response codes. (200,201,204,403 etc.)
+- Added Firestore transactions: in the case of a concurrent edit, the admin user is prompted to refresh the page.
+- Prevent duplicate value tags from the frontend (i.e. the admin cannot add 2 default values)
+- Added a loading icon
 
 ## Quick Start
 - Go to https://codeway-fullstack-case-b9901.web.app which will redirect you to /signin
@@ -81,6 +85,10 @@ VITE_FIREBASE_APP_ID = "app_id"
 
 VITE_BACKEND_URL = "backend_url_app_engine"
 ```
+- Run `npm run build` and copy the dist folder to public
+- Run `firebase init hosting`
+- Run `firebase deploy --only hosting`
+- Access the hosting URL from the given address in the console.
 
 ## Overview
 * Given the time constraint, in order to keep things simple, two separate services **frontend** and **backend** were used since separating the backend service into admin and user would introduce additional complexity due to separating databases and additional HTTP communication.
@@ -106,9 +114,7 @@ The backend verifies the user token sent via request headers before performing f
 
 ## Areas of Improvement
 * Error handling and warning dialogs.
-* Prevent duplicate documents or document field values.
-* A "loading" state can be added to make the frontend more user friendly.
-* Firebase transactions, locking (since consistency of config parameters is more important than availability, we should use an appropriate strategy)
+* Hard coded error messages in the frontend
 
 ## Front End Screenshots - Desktop
 
