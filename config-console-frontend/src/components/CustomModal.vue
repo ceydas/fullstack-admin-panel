@@ -45,7 +45,9 @@ const saveEdit = () => {
 }
 
 const addValueAndTag = () => {
-  let currentValueTag = editData.value[0].value_tag
+  let currentValueTag = addValueAndTagData.value_tag
+
+  console.log(currentValueTag)
 
   if (currentValueTag) {
     let tagExists = editData.value.some(
