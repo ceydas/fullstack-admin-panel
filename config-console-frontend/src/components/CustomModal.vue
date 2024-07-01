@@ -45,9 +45,20 @@ const saveEdit = () => {
 }
 
 const addValueAndTag = () => {
-  if (editData.value[0].value) {
-    editData.value.push({ ...addValueAndTagData })
-    Object.assign(addValueAndTagData, emptyValueAndTagData)
+  let currentValueTag = editData.value[0].value_tag
+
+  if (currentValueTag) {
+    let tagExists = editData.value.some(
+      (item: { value_tag: string }) => item.value_tag === currentValueTag
+    )
+    console.log(tagExists)
+    if (!tagExists) {
+      editData.value.push({ ...addValueAndTagData })
+      Object.assign(addValueAndTagData, emptyValueAndTagData)
+    }
+    else {
+      alert("A value parameter with the same tag already exists.")
+    }
   }
 }
 
