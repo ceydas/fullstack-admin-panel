@@ -1,5 +1,7 @@
-# Codeway Full Stack Developer Case Study
-Responsive admin configuration management panel and REST API for serving app logic and UI configurations for Codeway applications.
+#### 🚨 Links in this repository are no longer being served, due to preventing incurring costs from Google Cloud.
+
+# Full Stack Admin Configuration Panel
+Responsive admin configuration management panel and REST API for serving app logic and UI configurations.
 VueJS 3 for the front end and NodeJS for the back end are used.
 
 ## 🆕 What's New? Revision (July 1, 2024)
